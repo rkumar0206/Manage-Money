@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">ManageMoney</string>
+    <string name="add_remove_money">Add money</string>
+    <string name="amount">Amount</string>
+    <string name="where_you_earned_optional">Where you earned (optional)</string>
+    <string name="where_you_spent_optional">Where You Spent (optional)</string>
+    <string name="nul">Null</string>
+    <string name="earned">Earned</string>
+    <string name="spent">Spent</string>
+    <string name="closefragment">closeFragment</string>
+    <string name="status">Status</string>
+    <string name="add">Add</string>
+    <string name="_0_0">₹ 0.0</string>
+    <string name="i_have_0_0">I have ₹ 0.0 left.</string>
+    <string name="add_place">Add Place</string>
+    <string name="infobutton">infoButton</string>
+    <string name="enter_the_place">Enter the place</string>
+</resources>

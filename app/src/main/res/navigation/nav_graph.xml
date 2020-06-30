@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.managemoney.ui.fragments.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/home_fragment">
+        <action
+            android:id="@+id/action_homeFragment_to_historyFragment"
+            app:destination="@id/historyFragment"
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_addPlaceFragment"
+            app:destination="@id/addPlaceFragment"
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.managemoney.ui.fragments.HistoryFragment"
+        android:label="HistoryFragment"
+        tools:layout="@layout/history_fragment">
+        <action
+            android:id="@+id/action_historyFragment_to_addRemoveFragment"
+            app:destination="@id/addRemoveFragment"
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="messageFromHome"
+            app:argType="com.example.managemoney.model.messagePlace"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/addRemoveFragment"
+        android:name="com.example.managemoney.ui.fragments.AddRemoveFragment"
+        android:label="fragment_add_money"
+        tools:layout="@layout/fragment_add_money" >
+        <argument
+            android:name="messageFromHistory"
+            app:argType="com.example.managemoney.model.messagePlace"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/addPlaceFragment"
+        android:name="com.example.managemoney.ui.fragments.AddPlaceFragment"
+        android:label="fragment_add_place"
+        tools:layout="@layout/fragment_add_place" />
+
+
+</navigation>
