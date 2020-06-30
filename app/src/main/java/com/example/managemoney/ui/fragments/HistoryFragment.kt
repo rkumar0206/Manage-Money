@@ -16,6 +16,7 @@ import com.example.managemoney.database.entities.MoneyEntity
 import com.example.managemoney.model.messagePlace
 import com.example.managemoney.ui.MainActivity
 import com.example.managemoney.viewModels.MoneyViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.history_fragment.*
@@ -25,6 +26,10 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
     private lateinit var viewModel: MoneyViewModel
 
     private var place: String? = null
+    private var moneyLeft = 0.0
+    private var totalEarned = 0.0
+    private var totalSpent = 0.0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -35,6 +40,7 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
         getAllData()
         closeHistoryfragment.setOnClickListener(this)
         addPaymentFAB.setOnClickListener(this)
+        historyInfoButton.setOnClickListener(this)
     }
 
     private fun getMessage() {
@@ -60,6 +66,18 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
         viewModel.getAllMoneyByPlace(place!!).observe(viewLifecycleOwner, Observer {
 
             if (it.isNotEmpty()) {
+
+                for (money in it) {
+
+                    if (money.status == getString(R.string.earned)) {
+
+                        totalEarned += money.amount!!
+                    } else {
+                        totalSpent += money.amount!!
+                    }
+                }
+
+                moneyLeft = totalEarned - totalSpent
 
                 setUpRecyclerView(it)
             }
@@ -157,6 +175,10 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
         when (v?.id) {
 
+            R.id.historyInfoButton -> {
+                showAlertMessage()
+            }
+
             R.id.closeHistoryfragment -> {
 
                 requireActivity().onBackPressed()
@@ -172,6 +194,21 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
                 }
             }
         }
+    }
+
+    private fun showAlertMessage() {
+
+        val message = "\n\nMoney Left :     ₹ $moneyLeft" +
+                "\n\nTotal Earned :     ₹ $totalEarned" +
+                "\n\nTotal Spent :     ₹ $totalSpent\n"
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage(message)
+            .setPositiveButton("Ok") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
 
