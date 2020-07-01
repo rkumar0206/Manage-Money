@@ -3,6 +3,7 @@ package com.example.managemoney.ui.fragments
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,12 +24,15 @@ import kotlinx.android.synthetic.main.history_fragment.*
 
 class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListener {
 
+    private val TAG = "HistoryFragment"
     private lateinit var viewModel: MoneyViewModel
 
     private var place: String? = null
     private var moneyLeft = 0.0
     private var totalEarned = 0.0
     private var totalSpent = 0.0
+
+    private var mAdapter: HistoryRV_Adapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,6 +41,7 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
         getMessage()
 
+        mAdapter = HistoryRV_Adapter()
         getAllData()
         closeHistoryfragment.setOnClickListener(this)
         addPaymentFAB.setOnClickListener(this)
@@ -67,7 +72,12 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
             if (it.isNotEmpty()) {
 
+                totalEarned = 0.0
+                totalSpent = 0.0
+
                 for (money in it) {
+
+                    Log.d(TAG, "${money.amount}")
 
                     if (money.status == getString(R.string.earned)) {
 
@@ -90,18 +100,15 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
     private fun setUpRecyclerView(list: List<MoneyEntity>?) {
 
-        val adapter = HistoryRV_Adapter()
-
-
         list?.let {
 
-            adapter.differ.submitList(it)
+            mAdapter?.submitList(it)
 
             historyRV.apply {
 
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
-                historyRV.adapter = adapter
+                adapter = mAdapter
             }
         }
 
@@ -120,7 +127,7 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                deleteItem(adapter.differ.currentList[viewHolder.adapterPosition])
+                deleteItem(mAdapter?.getItemAtPosition(viewHolder.adapterPosition))
 
             }
 
@@ -165,6 +172,7 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
         money?.let {
             viewModel.delete(it)
+            Log.d(TAG, "deleted with id ${it.id} amount : ${it.amount}")
 
             Snackbar.make(coordinatorLayout, "Item Deleted", Snackbar.LENGTH_LONG)
                 .setAction("undo") {

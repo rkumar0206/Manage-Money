@@ -1,23 +1,31 @@
 package com.example.managemoney.ui.fragments
 
+import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.managemoney.R
 import com.example.managemoney.adapters.HomeRV_Adapter
 import com.example.managemoney.database.entities.PlaceEntity
 import com.example.managemoney.model.messagePlace
 import com.example.managemoney.ui.MainActivity
 import com.example.managemoney.viewModels.PlaceViewModel
+import com.google.android.material.snackbar.Snackbar
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.home_fragment.*
 
 class HomeFragment : Fragment(R.layout.home_fragment),
     View.OnClickListener, HomeRV_Adapter.OnItemClickListener {
 
     private lateinit var placeViewModel: PlaceViewModel
+    private var mAdapter: HomeRV_Adapter? = null
 
     /* private lateinit var entryAdd: ArrayList<Entry>*/
     private val TAG = "HomeFragment"
@@ -28,6 +36,7 @@ class HomeFragment : Fragment(R.layout.home_fragment),
         placeViewModel = (activity as MainActivity).placeViewModel
         /*  entryAdd = ArrayList()*/
 
+        mAdapter = HomeRV_Adapter()
         getAllData()
         fabAddPlace.setOnClickListener(this)
         /* seeHistoryButton.setOnClickListener(this)*/
@@ -52,20 +61,87 @@ class HomeFragment : Fragment(R.layout.home_fragment),
 
     private fun setUpRecyclerView(list: List<PlaceEntity>?) {
 
-        val adapter = HomeRV_Adapter()
         list?.let {
 
-            adapter.differ.submitList(it)
+            mAdapter?.submitList(it)
             homeRV.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
-                homeRV.adapter = adapter
+                adapter = mAdapter
 
             }
         }
 
-        adapter.setOnClickListener(this)
+        mAdapter?.setOnClickListener(this)
 
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+                deleteItem(mAdapter?.getPlace(viewHolder.adapterPosition))
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                RecyclerViewSwipeDecorator.Builder(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+                    .addBackgroundColor(Color.parseColor("#FFFFFF"))
+                    .addActionIcon(R.drawable.ic_baseline_delete_black_24)
+                    .create()
+                    .decorate()
+
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+            }
+        }).attachToRecyclerView(homeRV)
+
+
+    }
+
+    private fun deleteItem(item: PlaceEntity?) {
+
+        item?.let {
+            placeViewModel.delete(it)
+            Log.d(TAG, "deleted place with id ${it.id} place : ${it.place}")
+
+            Snackbar.make(homeCoordinatorLayout, "Item Deleted", Snackbar.LENGTH_LONG)
+                .setAction("Undo") {
+
+                    placeViewModel.insert(item)
+                }.show()
+        }
     }
 
     override fun onItemClick(place: String, position: Int) {
