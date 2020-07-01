@@ -79,6 +79,10 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
                 moneyLeft = totalEarned - totalSpent
 
+                youHaveTextView.text = "You Have ₹ $moneyLeft in your $place"
+                totalEarnedTextView.text = "$totalEarned"
+                totalSpentTexView.text = "$totalSpent"
+
                 setUpRecyclerView(it)
             }
         })
