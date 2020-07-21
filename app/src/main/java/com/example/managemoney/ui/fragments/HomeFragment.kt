@@ -1,16 +1,12 @@
 package com.example.managemoney.ui.fragments
 
-import android.graphics.Canvas
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.managemoney.R
 import com.example.managemoney.adapters.HomeRV_Adapter
 import com.example.managemoney.database.entities.PlaceEntity
@@ -18,7 +14,6 @@ import com.example.managemoney.model.messagePlace
 import com.example.managemoney.ui.MainActivity
 import com.example.managemoney.viewModels.PlaceViewModel
 import com.google.android.material.snackbar.Snackbar
-import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.home_fragment.*
 
 class HomeFragment : Fragment(R.layout.home_fragment),
@@ -73,61 +68,6 @@ class HomeFragment : Fragment(R.layout.home_fragment),
         }
 
         mAdapter?.setOnClickListener(this)
-
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
-                deleteItem(mAdapter?.getPlace(viewHolder.adapterPosition))
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                RecyclerViewSwipeDecorator.Builder(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-                    .addBackgroundColor(Color.parseColor("#FFFFFF"))
-                    .addActionIcon(R.drawable.ic_baseline_delete_black_24)
-                    .create()
-                    .decorate()
-
-                super.onChildDraw(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-            }
-        }).attachToRecyclerView(homeRV)
-
-
     }
 
     private fun deleteItem(item: PlaceEntity?) {
@@ -151,45 +91,10 @@ class HomeFragment : Fragment(R.layout.home_fragment),
 
     }
 
+    override fun onDeleteClick(placeEntity: PlaceEntity) {
 
-    /*  private fun addToChart(x: Float, y: Float) {
-          entryAdd.add(Entry(x, y))
-
-          val set1: LineDataSet
-          if (lineChart.data != null &&
-              lineChart.data.dataSetCount > 0
-          ) {
-              set1 = lineChart.data.getDataSetByIndex(0) as LineDataSet
-              set1.values = entryAdd
-              lineChart.data.notifyDataChanged()
-              lineChart.notifyDataSetChanged()
-          } else {
-              set1 = LineDataSet(entryAdd, "Data")
-              //set1.setDrawIcons(true)
-
-              set1.setCircleColor(Color.GREEN)
-              //set1.setCircleColorHole(Color.BLUE)
-              //set1.circleHoleRadius = 3f
-              set1.enableDashedLine(10f, 5f, 0f)
-              set1.enableDashedHighlightLine(10f, 5f, 0f)
-              set1.color = Color.DKGRAY
-              //set1.setCircleColor(Color.DKGRAY)
-              set1.lineWidth = 1f
-              //set1.circleRadius = 3f
-              set1.valueTextSize = 9f
-              //set1.setDrawFilled(true)
-              set1.formLineWidth = 1f
-              set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-              set1.formSize = 15f
-              //set1.fillColor = Color.DKGRAY
-
-              val dataSets: ArrayList<ILineDataSet> = ArrayList()
-              dataSets.add(set1)
-              val data = LineData(dataSets)
-              lineChart.data = data
-
-          }
-      }*/
+        deleteItem(placeEntity)
+    }
 
     override fun onClick(v: View?) {
 

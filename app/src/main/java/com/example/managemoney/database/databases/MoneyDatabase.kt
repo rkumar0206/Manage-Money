@@ -37,8 +37,6 @@ abstract class MoneyDatabase : RoomDatabase() {
                 MoneyDatabase::class.java,
                 "money_database.db"
             ).build()
-
         }
     }
-
 }

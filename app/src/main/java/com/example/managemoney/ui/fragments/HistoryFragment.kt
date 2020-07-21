@@ -1,16 +1,13 @@
 package com.example.managemoney.ui.fragments
 
-import android.graphics.Canvas
-import android.graphics.Color
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.managemoney.R
 import com.example.managemoney.adapters.HistoryRV_Adapter
 import com.example.managemoney.database.entities.MoneyEntity
@@ -19,10 +16,10 @@ import com.example.managemoney.ui.MainActivity
 import com.example.managemoney.viewModels.MoneyViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.history_fragment.*
 
-class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListener {
+class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListener,
+    HistoryRV_Adapter.OnItemClickListener {
 
     private val TAG = "HistoryFragment"
     private lateinit var viewModel: MoneyViewModel
@@ -66,6 +63,7 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getAllData() {
 
         viewModel.getAllMoneyByPlace(place!!).observe(viewLifecycleOwner, Observer {
@@ -112,60 +110,7 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
             }
         }
 
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            0, ItemTouchHelper.RIGHT
-        ) {
-
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
-                deleteItem(mAdapter?.getItemAtPosition(viewHolder.adapterPosition))
-
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-
-                RecyclerViewSwipeDecorator.Builder(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-                    .addBackgroundColor(Color.RED)
-                    .addActionIcon(R.drawable.ic_baseline_delete_24)
-                    .create()
-                    .decorate()
-
-                super.onChildDraw(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-            }
-        }).attachToRecyclerView(historyRV)
+        mAdapter?.setOnClickListener(this)
     }
 
     private fun deleteItem(money: MoneyEntity?) {
@@ -181,7 +126,6 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
                 }.show()
         }
     }
-
 
     override fun onClick(v: View?) {
 
@@ -221,6 +165,11 @@ class HistoryFragment : Fragment(R.layout.history_fragment), View.OnClickListene
             }
             .create()
             .show()
+    }
+
+    override fun onDeleteClick(moneyEntity: MoneyEntity) {
+
+        deleteItem(moneyEntity)
     }
 
 

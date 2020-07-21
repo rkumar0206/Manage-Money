@@ -1,9 +1,7 @@
 package com.example.managemoney.adapters
 
 import android.graphics.Color
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,10 +15,11 @@ class HomeRV_Adapter() : ListAdapter<PlaceEntity, HomeRV_Adapter.PlaceViewHolder
     private var mListener: OnItemClickListener? = null
 
     inner class PlaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
+        View.OnClickListener, View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
 
         init {
             itemView.setOnClickListener(this)
+            itemView.setOnCreateContextMenuListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -30,6 +29,32 @@ class HomeRV_Adapter() : ListAdapter<PlaceEntity, HomeRV_Adapter.PlaceViewHolder
 
                 mListener?.onItemClick(getItem(pos).place!!, pos)
             }
+        }
+
+        override fun onCreateContextMenu(
+            menu: ContextMenu?,
+            v: View?,
+            menuInfo: ContextMenu.ContextMenuInfo?
+        ) {
+            val delete = menu?.add(1, 1, 1, "Delete")
+            delete?.setOnMenuItemClickListener(this)
+        }
+
+        override fun onMenuItemClick(item: MenuItem?): Boolean {
+
+            when (item?.itemId) {
+
+                1 -> {
+                    val pos = adapterPosition
+                    if (pos != RecyclerView.NO_POSITION && mListener != null) {
+
+                        mListener?.onDeleteClick(getItem(pos))
+
+                    }
+                    return true
+                }
+            }
+            return false
         }
     }
 
@@ -46,20 +71,6 @@ class HomeRV_Adapter() : ListAdapter<PlaceEntity, HomeRV_Adapter.PlaceViewHolder
         }
     }
 
-    /*  val diffCallback = object : DiffUtil.ItemCallback<PlaceEntity>() {
-          override fun areItemsTheSame(oldItem: PlaceEntity, newItem: PlaceEntity): Boolean {
-
-              return oldItem.id == newItem.id
-          }
-
-          override fun areContentsTheSame(oldItem: PlaceEntity, newItem: PlaceEntity): Boolean {
-
-              return oldItem.place == newItem.place &&
-                      oldItem.timeStamp == newItem.timeStamp
-          }
-      }
-
-      val differ = AsyncListDiffer(this, diffCallback)*/
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceViewHolder {
 
@@ -74,10 +85,11 @@ class HomeRV_Adapter() : ListAdapter<PlaceEntity, HomeRV_Adapter.PlaceViewHolder
 
             placeTextView.text = getItem(position).place
 
-            val r = Random.nextInt(255)
-            val g = Random.nextInt(255)
-            val b = Random.nextInt(255)
-            cardView.setCardBackgroundColor(Color.rgb(r, g, b))
+            val r = Random.nextInt(60, 255)
+            val g = Random.nextInt(60, 255)
+            val b = Random.nextInt(60, 255)
+            cardView.setCardBackgroundColor(Color.argb(100, r, g, b))
+
         }
     }
 
@@ -89,6 +101,7 @@ class HomeRV_Adapter() : ListAdapter<PlaceEntity, HomeRV_Adapter.PlaceViewHolder
     interface OnItemClickListener {
 
         fun onItemClick(place: String, position: Int)
+        fun onDeleteClick(placeEntity: PlaceEntity)
 
     }
 
